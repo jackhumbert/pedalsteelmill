@@ -54,6 +54,19 @@ logit = function(logMsg) {
 	}
 }
 
+getChordsFromMood = function(mood) {
+	switch (mood) {
+		case "maj":
+			return chordDB.majorChords;
+		case "min":
+			return chordDB.minorChords;
+		case "7":
+			return chordDB.seventhChords;
+		default:
+			return null;
+	}
+}
+
 updateSelectedChord = function(chord) {
 	// update selectors
 	var moods = document.querySelectorAll('#moodSelector label');
@@ -70,17 +83,13 @@ updateSelectedChord = function(chord) {
 			chords[i].classList.add('active');
 		}
 	}
-	if ( selectedMood.name == "maj") {
-		selectedChord = chordDB.majorChords[chord.name];
-	} else {
-		selectedChord = chordDB.minorChords[chord.name];
-	}
+	selectedChord = getChordsFromMood(selectedMood.name)[chord.name];
 	chordPositions.update(selectedChord);
 }
 
 onNoteDropped = function(data, position) {
 	var note = data.root;
-	var chord = (chartSelectedMood.name=="maj") ? chordDB.majorChords[note] : chordDB.minorChords[note];
+	var chord = getChordsFromMood(chartSelectedMood.name)[note];
 
 	var chordPos = 0; // todo select chordPos based on siblings position to select closest spot on the neck ??
 

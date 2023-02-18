@@ -372,6 +372,7 @@ class ChordDB {
 		this.chordMoods = [
 			{ "name": "maj", "label": "Major"}
 			,{ "name": "min", "label": "Minor"}
+			,{ "name": "7", "label": "Seventh"}
 		];
         this.e9chordNames = [
 			{ "name": "E", "label": "E"}
@@ -416,6 +417,10 @@ class ChordDB {
 	get minorChords() {
 		return this.currentTuning.minorChords;
 	}
+  
+	get seventhChords() {
+		return this.currentTuning.seventhChords;
+	}
 
 	get chordNames() {
 		return this.currentTuning.chordNames;
@@ -426,7 +431,8 @@ class ChordDB {
         return {
             chordNames: this.e9chordNames,
             majorChords: this.createE9MajorChords(),
-		    minorChords: this.createE9MinorChords()
+		    minorChords: this.createE9MinorChords(),
+			seventhChords: this.createE9SeventhChords()
         };
     }
 	createE9MajorChords() {
@@ -445,6 +451,14 @@ class ChordDB {
 		}
 		return chordMap;
 	}
+	createE9SeventhChords() {
+		var chordMap = {}
+		for ( var i=0; i<this.e9chordNames.length; i++ ) {
+			var chordName = this.e9chordNames[i].name;
+			chordMap[chordName] = this.createE9SeventhChord(this.e9chordNames[i], i);
+		}
+		return chordMap;
+	}
 
 	createE9MajorChord(ch, noteOffset) {
 		var positions = [];
@@ -453,12 +467,12 @@ class ChordDB {
 
 		if ( noteOffset > 6 ) {
 			positions.unshift(this.createE9ChordPosition(ch.name, (7+noteOffset)-12, ["A","B"], [], [0, 0, 1, 1, 1, 1, 0, 1, 0, 1]));
-			positions.unshift(this.createE9ChordPosition(ch.name, (5+noteOffset)-12, [], ["LKR", "RKL"], [0, 0, 1, 1, 1, 1, 0, 1, 0, 1]));
+			positions.unshift(this.createE9ChordPosition(ch.name, (5+noteOffset)-12, [], ["LKR", "RKL"], [1, 1, 1, 1, 1, 1, 1, 1, 0, 1]));
 		} else if ( noteOffset > 4 ) {
-			positions[positions.length] = this.createE9ChordPosition(ch.name, 5+noteOffset, [], ["LKR", "RKL"], [0, 0, 1, 1, 1, 1, 0, 1, 0, 1]);
+			positions[positions.length] = this.createE9ChordPosition(ch.name, 5+noteOffset, [], ["LKR", "RKL"], [1, 1, 1, 1, 1, 1, 1, 1, 0, 1]);
 			positions.unshift(this.createE9ChordPosition(ch.name, (7+noteOffset)-12, ["A","B"], [], [0, 0, 1, 1, 1, 1, 0, 1, 0, 1]));
 		} else {
-			positions[positions.length] = this.createE9ChordPosition(ch.name, 5+noteOffset, [], ["LKR", "RKL"], [0, 0, 1, 1, 1, 1, 0, 1, 0, 1]);
+			positions[positions.length] = this.createE9ChordPosition(ch.name, 5+noteOffset, [], ["LKR", "RKL"], [1, 1, 1, 1, 1, 1, 1, 1, 0, 1]);
 			positions[positions.length] = this.createE9ChordPosition(ch.name, 7+noteOffset, ["A","B"], [], [0, 0, 1, 1, 1, 1, 0, 1, 0, 1]);
 		}
 
@@ -466,7 +480,7 @@ class ChordDB {
 	}
 	createE9MinorChord(ch, noteOffset) {
 		var positions = [];
-		positions[positions.length] = this.createE9ChordPosition(ch.name, noteOffset, ["B"], ["RKL"], [0, 0, 0, 1, 1, 1, 0, 1, 0, 1]);
+		positions[positions.length] = this.createE9ChordPosition(ch.name, noteOffset, ["B"], ["RKL"], [0, 0, 1, 1, 1, 1, 0, 1, 0, 1]);
 		positions[positions.length] = this.createE9ChordPosition(ch.name, 3+noteOffset, ["A"], [], [0, 0, 1, 1, 1, 1, 0, 1, 0, 1]);
 		if ( noteOffset > 4 ) {
 			positions.unshift(this.createE9ChordPosition(ch.name, (10+noteOffset)-12, ["B", "C"], [], [0, 0, 1, 1, 1, 1, 0, 0, 0, 0]));
@@ -476,9 +490,16 @@ class ChordDB {
 			positions.unshift(this.createE9ChordPosition(ch.name, (10+noteOffset)-12, ["B", "C"], [], [0, 0, 1, 1, 1, 1, 0, 0, 0, 0]));
 		} else {
 			positions[positions.length] = this.createE9ChordPosition(ch.name, 7+noteOffset, ["A", "B"], ["LKV"], [0, 0, 1, 1, 1, 1, 0, 1, 0, 1]);
-			positions[positions.length] = this.createE9ChordPosition(ch.name, 10+noteOffset, ["B", "C"], [], [0, 0, 1, 1, 1, 1, 0, 0, 0, 0]);
+			positions[positions.length] = this.createE9ChordPosition(ch.name, 10+noteOffset, ["B", "C"], [], [1, 0, 1, 1, 1, 1, 1, 0, 0, 0]);
 		}
 		return { "name" : ch.name, "label" : ch.label, "type" : "min", "positions": positions };
+	}
+	createE9SeventhChord(ch, noteOffset) {
+		var positions = [];
+		positions[positions.length] = this.createE9ChordPosition(ch.name, noteOffset, [], [], [0, 0, 1, 1, 1, 1, 0, 1, 1, 1]);
+		positions[positions.length] = this.createE9ChordPosition(ch.name, (5+noteOffset) % 12, ["B"], [], [1, 1, 1, 0, 1, 1, 1, 0, 0, 1]);
+
+		return { "name" : ch.name, "label" : ch.label, "type" : "7", "positions": positions };
 	}
 	createE9ChordPosition(note, noteOffset, pedals, levers, stringMask) {
 		var strings = new Array();
